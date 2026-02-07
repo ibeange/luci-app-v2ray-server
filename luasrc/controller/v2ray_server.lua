@@ -31,10 +31,20 @@ function clear_log()
 end
 
 function users_status()
-	local e = {}
-	e.index = luci.http.formvalue("index")
-	e.status = luci.sys.call("ps w | grep -F '/var/etc/v2ray_server/" .. luci.http.formvalue("id") .. "' >/dev/null") == 0
-	http_write_json(e)
+    local e = {}
+
+    local index = luci.http.formvalue("index")
+    local id    = luci.http.formvalue("id") or ""
+
+    local pattern = "/var/etc/v2ray_server/" .. id
+    local rc = luci.sys.call(
+        "pgrep -f " .. luci.util.shellquote(pattern) .. " >/dev/null"
+    )
+
+    e.index  = index
+    e.status = (rc == 0)
+
+    luci.http.write_json(e)
 end
 
 function v2ray_check()
