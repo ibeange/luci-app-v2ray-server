@@ -249,11 +249,26 @@ function to_download(url)
     return {code = 0, file = tmp_file}
 end
 
+local function ensure_unzip()
+    -- 1) 已存在命令就直接返回
+    if fs.access("/usr/bin/unzip") or fs.access("/bin/unzip") then
+        return true
+    end
+
+    -- 2) 优先用 opkg（若存在），否则用 apk
+    if fs.access("/bin/opkg") or fs.access("/usr/bin/opkg") then
+        sys.call("opkg update >/dev/null 2>&1")
+        return sys.call("opkg install unzip >/dev/null 2>&1") == 0
+    elseif fs.access("/usr/bin/apk") then
+        return sys.call("apk add unzip >/dev/null 2>&1") == 0
+    end
+
+    return false
+end
+
 function to_extract(file, subfix)
-    local isinstall_unzip = ipkg.installed("unzip")
-    if isinstall_unzip == nil then
-        ipkg.update()
-        ipkg.install("unzip")
+    if not ensure_unzip() then
+        return { code = 1, error = i18n.translate("Missing unzip. Please install unzip first.") }
     end
 
     if not file or file == "" or not fs.access(file) then
@@ -268,7 +283,6 @@ function to_extract(file, subfix)
          function(chunk) output[#output + 1] = chunk end)
 
     local files = util.split(table.concat(output))
-
     exec("/bin/rm", {"-f", file})
 
     return {code = 0, file = tmp_dir}
