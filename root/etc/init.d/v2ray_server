@@ -1,18 +1,24 @@
 #!/bin/sh /etc/rc.common
-
 START=99
 
+LUA=/usr/bin/lua
+APP=/usr/lib/lua/luci/model/cbi/v2ray_server/api/app.lua
+
 start() {
-	/usr/lib/lua/luci/model/cbi/v2ray_server/api/app.lua start
+    # 可选：给系统一点时间（很多开机失败都和时序有关）
+    sleep 15
+
+    # 把 Lua 输出/错误全部送进系统日志
+    /usr/bin/lua /usr/lib/lua/luci/model/cbi/v2ray_server/api/app.lua start 2>&1 | logger -t v2ray_boot
 }
 
 stop() {
-	/usr/lib/lua/luci/model/cbi/v2ray_server/api/app.lua stop
+    /usr/bin/lua /usr/lib/lua/luci/model/cbi/v2ray_server/api/app.lua stop 2>&1 | logger -t v2ray_boot
 }
 
 restart() {
-	stop
-	start
+    stop
+    start
 }
 
 chmod 755 /etc/init.d/v2ray_server
