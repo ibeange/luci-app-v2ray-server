@@ -4,7 +4,7 @@ local sys = require "luci.sys"
 local uci = require"luci.model.uci".cursor()
 local util = require "luci.util"
 local i18n = require "luci.i18n"
-local ok, ipkg = pcall(require, "luci.model.ipkg")
+local has_ipkg, ipkg = pcall(require, "luci.model.ipkg")
 
 local appname = "v2ray_server"
 local v2ray_api ="https://api.github.com/repos/XTLS/Xray-core/releases/latest"
