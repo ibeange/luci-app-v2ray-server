@@ -14,3 +14,5 @@ restart() {
 	stop
 	start
 }
+
+chmod 755 /etc/init.d/v2ray_server
