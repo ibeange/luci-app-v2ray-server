@@ -33,7 +33,7 @@ end
 function users_status()
 	local e = {}
 	e.index = luci.http.formvalue("index")
-	e.status = luci.sys.call("ps -w| grep -v grep | grep '/var/etc/v2ray_server/" .. luci.http.formvalue("id") .. "' >/dev/null") == 0
+	e.status = luci.sys.call("ps w | grep -F '/var/etc/v2ray_server/" .. luci.http.formvalue("id") .. "' >/dev/null") == 0
 	http_write_json(e)
 end
 
